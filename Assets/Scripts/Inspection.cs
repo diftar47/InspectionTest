@@ -5,42 +5,75 @@ using UnityEngine.UI;
 
 public class Inspection : MonoBehaviour
 {
-    [SerializeField] Image evidence;
-    [SerializeField] Image item;
+    [SerializeField] private Image evidence;
+    [SerializeField] private Image item;
+    [SerializeField] private Text description;
 
     private int currentItem = 0;
-    private Image[] items;
+    private int index;
+    private bool isFoundEvidence;
+    private Sprite[] items;
 
-    private void GoForward()
+    private void CheckIndex()
+    {
+        if (index == currentItem)
+        {
+            evidence.gameObject.SetActive(true);
+        }
+        else
+        {
+            evidence.gameObject.SetActive(false);
+        }
+        item.sprite = items[currentItem];
+    }
+
+    public void GoForward()
     {
         currentItem++;
-        if(currentItem > items.Length - 1)
+        if (currentItem > items.Length - 1)
         {
             currentItem = 0;
         }
-        item = items[currentItem];
+        CheckIndex();
+    }
+
+    public void GoBack()
+    {
+        currentItem--;
+        if (currentItem > items.Length - 1 || currentItem < 0)
+        {
+            currentItem = items.Length - 1;
+        }
+        CheckIndex();
+    }
+
+    public void OnDescriptionClick()
+    {
+        description.gameObject.SetActive(true);
+        isFoundEvidence = true;
     }
 
     public void Show(EvidenceExemple exemple)
     {
-        evidence.gameObject.SetActive(false);
-        evidence.transform.position = exemple.evidencePosition;
-        evidence = exemple.evidanceImage;
-        if (exemple.evidenceIndex == currentItem)
-        {
-            evidence.gameObject.SetActive(true);
-        }
+        description.gameObject.SetActive(false);
+        description.text = "Вы нашли: " + exemple.description;
 
-        items = new Image[exemple.itemImages.Length];
+        index = exemple.evidenceIndex;
+        evidence.gameObject.SetActive(false);
+
+        evidence.sprite = exemple.evidanceImage;
+        evidence.transform.position = exemple.evidencePosition;
+
+        items = new Sprite[exemple.itemImages.Length];
         items = exemple.itemImages;
-        item = items[currentItem];
+        CheckIndex();
     }
 }
 
 public class EvidenceExemple
 {
-    public Image []itemImages;
-    public Image evidanceImage;
+    public Sprite[] itemImages;
+    public Sprite evidanceImage;
     public int evidenceIndex;
     public string description;
     public Vector2 evidencePosition;
